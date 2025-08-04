@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>学生签到页面</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 100px; }
+    input, button { padding: 10px; font-size: 16px; margin: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>👨‍🎓 学生签到页面</h2>
+
+  <p>班级：<span id="classInfo"></span></p>
+  <p>签到码：<span id="codeInfo"></span></p>
+
+  <input id="studentName" placeholder="输入你的名字"><br>
+  <input id="studentID" placeholder="输入学号"><br>
+  <button onclick="submit()">签到</button>
+
+  <p id="result"></p>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const classVal = params.get("class");
+    const code = params.get("code");
+
+    document.getElementById("classInfo").textContent = classVal;
+    document.getElementById("codeInfo").textContent = code;
+
+    function submit() {
+      const name = document.getElementById("studentName").value.trim();
+      const id = document.getElementById("studentID").value.trim();
+      if (!name || !id) {
+        alert("请输入姓名和学号");
+        return;
+      }
+      const key = classVal;
+      const data = JSON.parse(localStorage.getItem("attendance") || "{}");
+      if (!data[key]) data[key] = [];
+      const entry = `${name}（${id}）`;
+      if (!data[key].includes(entry)) data[key].push(entry);
+      localStorage.setItem("attendance", JSON.stringify(data));
+      document.getElementById("result").textContent = "✅ 签到成功！";
+    }
+  </script>
+
+</body>
+</html>

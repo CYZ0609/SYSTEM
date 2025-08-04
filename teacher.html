@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>老师签到控制台</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 30px; }
+    select, input, button { padding: 10px; font-size: 16px; margin: 5px; }
+    #studentList { margin-top: 30px; text-align: left; display: inline-block; }
+  </style>
+</head>
+<body>
+
+  <h2>📘 老师签到控制台</h2>
+
+  <label>选择班级：</label>
+  <select id="classSelect">
+    <option value="2A">2A</option>
+    <option value="2B">2B</option>
+    <option value="3A">3A</option>
+    <option value="3B">3B</option>
+  </select>
+
+  <label>签到码：</label>
+  <input id="codeInput" value="PM-2025">
+
+  <button onclick="generateQR()">生成签到二维码</button>
+
+  <br><br>
+  <canvas id="qrcode"></canvas>
+
+  <div id="studentList">
+    <h3>✅ 已签到名单</h3>
+    <ul id="namesList"></ul>
+    <p><strong>总人数：<span id="count">0</span></strong></p>
+  </div>
+
+  <script>
+    function generateQR() {
+      const classVal = document.getElementById("classSelect").value;
+      const code = document.getElementById("codeInput").value;
+      const url = `student.html?class=${classVal}&code=${encodeURIComponent(code)}`;
+
+      QRCode.toCanvas(document.getElementById('qrcode'), url, function (error) {
+        if (error) console.error(error);
+        console.log("QR 码已生成");
+      });
+
+      loadStudentList(classVal);
+    }
+
+    function loadStudentList(classVal) {
+      const data = JSON.parse(localStorage.getItem("attendance") || "{}");
+      const list = data[classVal] || [];
+
+      const ul = document.getElementById("namesList");
+      const count = document.getElementById("count");
+      ul.innerHTML = "";
+      list.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        ul.appendChild(li);
+      });
+
+      count.textContent = list.length;
+    }
+
+    document.getElementById("classSelect").addEventListener("change", () => {
+      generateQR();
+    });
+
+    window.onload = generateQR;
+  </script>
+
+</body>
+</html>
